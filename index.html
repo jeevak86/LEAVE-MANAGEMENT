@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6fb">
+  <title>Leave Management Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Leavewise home">
+        <span class="brand-icon" aria-hidden="true">L</span>
+        <span>leavewise<span class="brand-period">.</span><small>Leave Management</small></span>
+      </a>
+      <div class="topbar-right">
+        <span class="demo-label"><span></span> Local demo</span>
+        <button id="reset-demo" class="text-button" type="button">Reset demo data</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="welcome-row">
+        <div>
+          <p class="eyebrow">WORKSPACE</p>
+          <h1>Leave management</h1>
+          <p class="welcome-copy">Submit time off and keep track of every request.</p>
+        </div>
+        <div class="role-switch" role="tablist" aria-label="Choose dashboard">
+          <button class="role-tab active" id="student-tab" type="button" role="tab" aria-selected="true" aria-controls="student-view">Student portal</button>
+          <button class="role-tab" id="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-view">Admin dashboard</button>
+        </div>
+      </section>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <!-- Student View -->
+      <section id="student-view" class="view" role="tabpanel" aria-labelledby="student-tab">
+        <div class="student-heading panel">
+          <div class="avatar" id="student-avatar">G</div>
+          <div class="student-details">
+            <p class="eyebrow">STUDENT ACCOUNT</p>
+            <h2 id="student-name">Student</h2>
+            <p id="student-meta" class="muted"></p>
+          </div>
+          <label class="student-picker-wrap" for="student-picker">Viewing account
+            <select id="student-picker" aria-label="Choose student account"></select>
+          </label>
+        </div>
+
+        <div class="balance-grid">
+          <article class="balance-card casual-card">
+            <div class="balance-heading"><span class="balance-icon">☼</span><span>Casual leave</span></div>
+            <div class="balance-value"><strong id="casual-balance">0</strong><span>days available</span></div>
+            <div class="balance-track"><span id="casual-bar"></span></div>
+          </article>
+          <article class="balance-card medical-card">
+            <div class="balance-heading"><span class="balance-icon">＋</span><span>Medical leave</span></div>
+            <div class="balance-value"><strong id="medical-balance">0</strong><span>days available</span></div>
+            <div class="balance-track"><span id="medical-bar"></span></div>
+          </article>
+          <article class="balance-card request-card">
+            <div class="balance-heading"><span class="balance-icon">▤</span><span>My requests</span></div>
+            <div class="balance-value"><strong id="my-request-count">0</strong><span>submitted</span></div>
+            <p class="balance-footnote"><span class="small-dot"></span><span id="my-pending-count">0 pending review</span></p>
+          </article>
+        </div>
+
+        <div class="student-columns">
+          <section class="panel apply-panel">
+            <div class="section-heading">
+              <div><p class="eyebrow">NEW REQUEST</p><h2>Apply for leave</h2></div>
+              <span class="heading-icon">＋</span>
+            </div>
+            <form id="leave-form">
+              <label for="leave-type">Leave type</label>
+              <select id="leave-type" required>
+                <option value="casual">Casual leave</option>
+                <option value="medical">Medical leave</option>
+              </select>
+              <div class="form-row">
+                <div>
+                  <label for="leave-days">Number of days</label>
+                  <input id="leave-days" type="number" min="1" max="60" step="1" value="1" required>
+                </div>
+                <div>
+                  <label for="leave-start">Start date</label>
+                  <input id="leave-start" type="date" required>
+                </div>
+              </div>
+              <label for="leave-reason">Reason for leave</label>
+              <textarea id="leave-reason" rows="4" maxlength="500" placeholder="Add a short note for your approver" required></textarea>
+              <p id="form-error" class="form-error" aria-live="polite"></p>
+              <button class="primary-button full-button" type="submit">Submit request <span aria-hidden="true">→</span></button>
+              <p class="form-footnote">Your leave balance changes only after approval.</p>
+            </form>
+          </section>
+
+          <section class="panel history-panel">
+            <div class="section-heading history-heading">
+              <div><p class="eyebrow">YOUR ACTIVITY</p><h2>Request history</h2></div>
+              <span class="count-pill" id="history-count">0</span>
+            </div>
+            <div id="student-requests" class="request-list"></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- Admin View -->
+      <section id="admin-view" class="view" role="tabpanel" aria-labelledby="admin-tab" hidden>
+        <div class="admin-intro">
+          <div>
+            <p class="eyebrow">ADMINISTRATION</p>
+            <h2>Approval dashboard</h2>
+            <p class="welcome-copy">Review requests and update each student’s leave balance.</p>
+          </div>
+          <div class="admin-updated"><span class="online-dot"></span>Saved on this device</div>
+        </div>
+        <div class="admin-stats">
+          <article class="admin-stat pending-stat"><span class="stat-caption">Pending review</span><strong id="admin-pending">0</strong><span class="stat-symbol">◷</span></article>
+          <article class="admin-stat approved-stat"><span class="stat-caption">Approved</span><strong id="admin-approved">0</strong><span class="stat-symbol">✓</span></article>
+          <article class="admin-stat declined-stat"><span class="stat-caption">Declined</span><strong id="admin-declined">0</strong><span class="stat-symbol">×</span></article>
+          <article class="admin-stat total-stat"><span class="stat-caption">Total requests</span><strong id="admin-total">0</strong><span class="stat-symbol">▤</span></article>
+        </div>
+        <section class="panel admin-requests-panel">
+          <div class="section-heading admin-table-heading">
+            <div><p class="eyebrow">INBOX</p><h2>Leave requests</h2></div>
+            <label class="filter-label" for="status-filter">Filter
+              <select id="status-filter">
+                <option value="all">All requests</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="declined">Declined</option>
+              </select>
+            </label>
+          </div>
+          <div id="admin-requests" class="admin-request-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
